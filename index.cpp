@@ -3,13 +3,13 @@
 
 using namespace std;
 
-const int INIT = 0;
+const int CREATED = 0;
 const int ACTIVE_READY = 1;
 const int STATIC_READY = 2;
-const int EXECUTE = 3;
-const int ACTIVE_BLOCK = 4;
-const int STATIC_BLOCK = 5;
-const int OVER = 6;
+const int RUNNING = 3;
+const int ACTIVE_BLOCKED = 4;
+const int STATIC_BLOCKED = 5;
+const int TERMINATED = 6;
 
 class Process
 {
@@ -25,7 +25,7 @@ class Process
 };
 
 Process::Process(int processID){
-    state = INIT;
+    state = CREATED;
     pid = processID;
 };
 
@@ -33,20 +33,20 @@ string Process::getStateStr()
 {
     string str = "invalid state:" + to_string(this->state) + " in process: " + to_string(this->pid);
 
-    if (this->state == INIT)
-        return "INIT";
+    if (this->state == CREATED)
+        return "CREATED";
     else if (this->state == ACTIVE_READY)
         return "ACTIVE_READY";
     else if (this->state == STATIC_READY)
         return "STATIC_READY";
-    else if(this->state == EXECUTE)
-        return "EXECUTE";
-    else if(this->state == ACTIVE_BLOCK)
-        return "ACTIVE_BLOCK";
-    else if(this->state == STATIC_BLOCK)
-        return "STATIC_BLOCK";
-    else if(this->state == OVER)
-        return "OVER";
+    else if(this->state == RUNNING)
+        return "RUNNING";
+    else if(this->state == ACTIVE_BLOCKED)
+        return "ACTIVE_BLOCKED";
+    else if(this->state == STATIC_BLOCKED)
+        return "STATIC_BLOCKED";
+    else if(this->state == TERMINATED)
+        return "TERMINATED";
     else
         throw runtime_error(str);
 };
@@ -63,8 +63,8 @@ void Process::switchTo(int state)
         to_string(this->state) + " to " + to_string(state);
 
     switch(this->state){
-        case INIT:
-            // process is init state
+        case CREATED:
+            // process is CREATED state
             if (state == ACTIVE_READY)
                 this->state = state;
             else if (state == STATIC_READY)
@@ -76,7 +76,7 @@ void Process::switchTo(int state)
 
         case ACTIVE_READY:
             // process is active_ready state
-            if (state == EXECUTE)
+            if (state == RUNNING)
                 this->state = state;
             else if (state == STATIC_READY)
                 this->state = state;
@@ -94,41 +94,42 @@ void Process::switchTo(int state)
 
             break;
 
-        case EXECUTE:
+        case RUNNING:
+            // process is running state
             if (state == ACTIVE_READY)
                 this->state = state;
             else if(state == STATIC_READY)
                 this->state = state;
-            else if(state == ACTIVE_BLOCK)
+            else if(state == ACTIVE_BLOCKED)
                 this->state = state;
-            else if(state == OVER)
+            else if(state == TERMINATED)
                 throw runtime_error(str);
 
             break;
 
-        case ACTIVE_BLOCK:
+        case ACTIVE_BLOCKED:
 
             // process is active_block state
             if (state == ACTIVE_READY)
                 this->state = state;
-            else if(state == STATIC_BLOCK)
+            else if(state == STATIC_BLOCKED)
                 this->state = state;
             else
                 throw runtime_error(str);
 
             break;
 
-        case STATIC_BLOCK:
+        case STATIC_BLOCKED:
             // process is static_block state
             if (state == STATIC_READY)
                 this->state = state;
-            else if(state == ACTIVE_BLOCK)
+            else if(state == ACTIVE_BLOCKED)
                 this->state = state;
             else
                 throw runtime_error(str);
 
             break;
-        case OVER:
+        case TERMINATED:
             throw runtime_error(str);
     }
 };
@@ -151,7 +152,7 @@ int main()
 
 
     // this operation will throw a error
-    test.switchTo(OVER);
+    test.switchTo(TERMINATED);
 
     return 0;
 };
