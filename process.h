@@ -1,4 +1,3 @@
-#include <iostream>
 #include <string>
 
 using namespace std;
@@ -18,6 +17,7 @@ class Process
         string getStateStr();
         int getPid();
         void switchTo(int state);
+        void Terminate();
 
     private:
         int state;
@@ -132,27 +132,4 @@ void Process::switchTo(int state)
         case TERMINATED:
             throw runtime_error(str);
     }
-};
-
-
-
-int main()
-{
-    Process test(2);
-    cout << "Pid is: " + to_string(test.getPid()) << endl
-        << "State is: " + test.getStateStr() << endl
-        << endl;
-
-    // this operation is ok
-    test.switchTo(ACTIVE_READY);
-
-    cout << "Pid is: " + to_string(test.getPid()) << endl
-        << "State is: " + test.getStateStr() << endl
-        << endl;
-
-
-    // this operation will throw a error
-    test.switchTo(TERMINATED);
-
-    return 0;
 };
