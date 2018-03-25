@@ -13,21 +13,64 @@ const int TERMINATED = 6;
 class Process
 {
     public:
-        Process(int processID);
+        Process(int pid);
         string getStateStr();
         int getPid();
-        void switchTo(int state);
+        //void Create();
+        void Schedule();
         void Terminate();
+        void Block();
+        void Wakeup();
+        void Suspend();
+        void Active();
 
     private:
         int state;
         int pid;
+
+        void switchTo(int state);
 };
 
 Process::Process(int processID){
-    state = CREATED;
+    state = ACTIVE_READY;
     pid = processID;
 };
+void Process::Schedule(){
+    this->switchTo(RUNNING);
+}
+void Process::Terminate(){
+    this->switchTo(TERMINATED);
+}
+void Process::Block(){
+    this->switchTo(ACTIVE_BLOCKED);
+}
+void Process::Wakeup(){
+    this->switchTo(ACTIVE_READY);
+}
+void Process::Suspend(){
+    switch(this->state){
+        case ACTIVE_READY:
+            this->switchTo(STATIC_READY);
+            break;
+        case ACTIVE_BLOCKED:
+            this->switchTo(STATIC_BLOCKED);
+            break;
+        default:
+            this->switchTo(STATIC_BLOCKED);
+    }
+}
+void Process::Active(){
+    switch(this->state){
+        case STATIC_READY:
+            this->switchTo(ACTIVE_READY);
+            break;
+        case STATIC_BLOCKED:
+            this->switchTo(ACTIVE_BLOCKED);
+            break;
+        default:
+            this->switchTo(ACTIVE_BLOCKED);
+    }
+}
 
 string Process::getStateStr()
 {
