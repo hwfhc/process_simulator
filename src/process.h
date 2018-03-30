@@ -1,9 +1,10 @@
 #include <string>
-#include "./define"
+#include "./emitter.h"
+#include "./define.h"
 
 using namespace std;
 
-class Process
+class Process:public EventEmitter
 {
     public:
         Process(int pid);
@@ -16,6 +17,10 @@ class Process
         void Wakeup();
         void Suspend();
         void Active();
+
+        void route(int event){
+            cout << event << endl;
+        }
 
     private:
         int state;
